@@ -8,29 +8,29 @@ use App\Models\Teacher;
 use App\Models\Personal;
 class NewCardsController extends Controller
 {
-    public function actionGetStudents(Request $request)
-    {
+    public function actionGetUsers(Request $request){
 
-        $iin = $request->query('iin');
-        $name = $request->query('name');
-        $surname = $request->query('surname');
-        $school = $request->query('school');
+        $iin = $request->input('iin');
+        $name = $request->input('name');
+        $surname = $request->input('surname');
+        $school = $request->input('school');
+        $status = $request->input('status');
 
-        $school_boy = Students::getSchoolBoy($iin);
-
-//        switch (true) {
-//            case $school_boy['data']['name'] != $name:
-//                echo 'Имя не верно!';
-//                exit();
-//            case $school_boy['data']['surname'] != $surname:
-//                echo 'Не правильная фамилия!';
-//                exit();
-//            case $school_boy['data']['id_mektep'] != $school:
-//                echo 'Не та школа!';
-//                exit();
-//        }
-
-        return $school_boy;
+        switch ($status){
+            case 'teacher':
+                $user = Teacher::getTeacher($iin);
+                $result = $this->validateUsers($user, $name, $surname, $school, $status);
+                return $result;
+            case 'personal':
+                $user = Personal::getPersonal($iin);
+                $result = $this->validateUsers($user, $name, $surname, $school, $status);
+                return $result;
+            case 'student';
+                $user = Students::getSchoolBoy($iin);
+                $result = $this->validateUsers($user, $name, $surname, $school, $status);
+                return $result;
+        }
+        return response()->json(['error' => 'Неверный запрос'], 406);
     }
 
     public function actionRegions(){
@@ -47,33 +47,31 @@ class NewCardsController extends Controller
         return $schools;
     }
 
-    public function actionGetPersonal(Request $request){
+    public function validateUsers($user, $name, $surname, $school){
 
-        $iin = $request->query('iin');
-        $name = $request->query('name');
-        $surname = $request->query('surname');
-        $school = $request->query('school');
-        $status = $request->query('status');
-
-//        switch (true) {
-//            case $school_boy['data']['name'] != $name:
-//                echo 'Имя не верно!';
-//                exit();
-//            case $school_boy['data']['surname'] != $surname:
-//                echo 'Не правильная фамилия!';
-//                exit();
-//            case $school_boy['data']['id_mektep'] != $school:
-//                echo 'Не та школа!';
-//                exit();
-//        }
-
-        switch ($status){
-            case 'teacher':
-                $teacher = Teacher::getTeacher($iin);
-                return $teacher;
-            case 'personal':
-                $personal = Personal::getPersonal($iin);
-                return $personal;
+        if($user['data'] == null){
+            return response()->json(['error' => 'Такой пользователь не найден!'], 400);
+            exit();
         }
+        switch (true) {
+            case $user['data']['name'] != $name:
+                return response()->json(['error' => 'Имя не верно!'], 401);
+                exit();
+            case $user['data']['surname'] != $surname:
+                return response()->json(['error' => 'Не правильная фамилия!'], 402);
+                exit();
+            case $user['data']['id_mektep'] != $school:
+                return response()->json(['error' => 'Не та школа!'], 403);
+                exit();
+        }
+        return $user;
+    }
+    public function saveNewCards(Request $request){
+
+        foreach ($request as $studentData) {
+            Students::create($studentData);
+        }
+
+
     }
 }

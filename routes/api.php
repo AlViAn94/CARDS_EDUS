@@ -21,12 +21,12 @@ use App\Http\Controllers\NewCardsController;
 
 // Выпуск карты
 
-Route::get('/students', [NewCardsController::class, 'actionGetStudents']);
-
-Route::get('/personal', [NewCardsController::class, 'actionGetPersonal']);
+Route::get('/users', [NewCardsController::class, 'actionGetUsers']);
 
 Route::get('/schools', [NewCardsController::class, 'actionGetSchools']);
 
 Route::get('/region', [NewCardsController::class, 'actionRegions']);
+
+Route::get('/save', [NewCardsController::class, 'saveNewCards']);
 
 // Менеджер
