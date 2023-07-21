@@ -19,15 +19,15 @@ class NewCardsController extends Controller
         switch ($status){
             case 'teacher':
                 $user = Teacher::getTeacher($iin);
-                $result = $this->validateUsers($user, $name, $surname, $school, $status);
+                $result = $this->validateUsers($user, $name, $surname, $school);
                 return $result;
             case 'personal':
                 $user = Personal::getPersonal($iin);
-                $result = $this->validateUsers($user, $name, $surname, $school, $status);
+                $result = $this->validateUsers($user, $name, $surname, $school);
                 return $result;
             case 'student';
                 $user = Students::getSchoolBoy($iin);
-                $result = $this->validateUsers($user, $name, $surname, $school, $status);
+                $result = $this->validateUsers($user, $name, $surname, $school);
                 return $result;
         }
         return response()->json(['error' => 'Неверный запрос'], 406);
@@ -48,7 +48,10 @@ class NewCardsController extends Controller
     }
 
     public function validateUsers($user, $name, $surname, $school){
-
+        /*
+         * если верну старый метод получение ученика в mektep api то убрать одну ['data']!
+         */
+//        echo '<pre>' . print_r($user, true); exit();
         if($user['data'] == null){
             return response()->json(['error' => 'Такой пользователь не найден!'], 400);
             exit();
@@ -67,11 +70,57 @@ class NewCardsController extends Controller
         return $user;
     }
     public function saveNewCards(Request $request){
+//        $data = $request->json()->all();
+//        echo '<pre>' . print_r($data, true); exit();
+        $data['id_mektep'] = $request->input('id_mektep');
+        $data['name'] = $request->input('name');
+        $data['surname'] = $request->input('surname');
+        $data['lastname'] = $request->input('lastname');
+        $data['iin'] = $request->input('iin');
+        $data['birthday'] = $request->input('birthday');
+        $data['pol'] = $request->input('pol');
+        $status = $request->input('status');
 
-        foreach ($request as $studentData) {
-            Students::create($studentData);
+        if ($status == 'student'){
+            $data['national'] = $request->input('national');
+            $data['id_class'] = $request->input('id_class');
+            $data['parent_ata_id'] = $request->input('parent_ata_id');
+            $data['parent_ana_id'] = $request->input('parent_ana_id');
         }
 
+        $data['pay'] = '1';
+        $data['curdate'] = date('Y-m-d');
 
+        switch ($status) {
+            case 'teacher':
+                $user = Teacher::where('iin', $data['iin'])->first();
+//                echo '<pre>' . print_r($user,true); exit();
+//                if($user){
+//                    return response()->json(['massage' => 'Такой пользователь существует! '], 404);
+//                }else{
+                    Teacher::create($data);
+                    return response()->json(['access' => 'Сохранение прошло успешно!'], 200);
+//                }
+
+            case 'personal':
+                $user = Personal::where('iin', $data['iin'])->first();
+//                if($user){
+//                    return response()->json(['massage' => 'Такой пользователь существует! '], 404);
+//                }else{
+                    Personal::create($data);
+                    return response()->json(['access' => 'Сохранение прошло успешно!'], 200);
+//                }
+
+            case 'student':
+                $user = Students::where('iin', $data['iin'])->first();
+//                if($user){
+//                    return response()->json(['massage' => 'Такой пользователь существует! '], 404);
+//                }else{
+                    Students::create($data);
+                    return response()->json(['access' => 'Сохранение прошло успешно!'], 200);
+//                }
+        }
+
+        return response()->json(['error' => 'Неверный запрос'], 406);
     }
 }

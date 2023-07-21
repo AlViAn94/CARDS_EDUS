@@ -8,6 +8,17 @@ use GuzzleHttp\Client;
 
 class Personal extends Model
 {
+    protected $fillable = [
+        'id_mektep',
+        'name',
+        'surname',
+        'lastname',
+        'iin',
+        'birthday',
+        'pol',
+        'pay',
+        'curdate'
+    ];
     public static function getPersonal($iin)
     {
         $client = new Client();

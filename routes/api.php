@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NewCardsController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,7 @@ use App\Http\Controllers\NewCardsController;
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-
+Route::post('login', [AuthController::class, 'login']);
 // Выпуск карты
 
 Route::get('/users', [NewCardsController::class, 'actionGetUsers']);
@@ -27,6 +28,8 @@ Route::get('/schools', [NewCardsController::class, 'actionGetSchools']);
 
 Route::get('/region', [NewCardsController::class, 'actionRegions']);
 
-Route::get('/save', [NewCardsController::class, 'saveNewCards']);
+Route::post('/save', [NewCardsController::class, 'saveNewCards']);
+
+Route::get('logout', [AuthController::class, 'logout']);
 
 // Менеджер

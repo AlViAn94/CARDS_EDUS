@@ -66,5 +66,8 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 Start server
+Work
+php artisan serve --host=192.168.31.88 --port=8080
 
-php artisan serve --host=192.168.31.89 --port=8080
+Home
+php artisan serve --host=192.168.0.104 --port=8080
